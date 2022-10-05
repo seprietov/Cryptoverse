@@ -1,0 +1,197 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="cipher-title">
+    <h1>AFFINE CIPHER</h1>
+</div>
+
+<section id="ende">
+    <div class="inner">
+        <section id="encrypt">
+            <form action="." method="post">
+                <h2>Encrypt</h2>
+                {% csrf_token %}
+                {% if not encrypted %}
+                    
+                {% if mistake_encrypt%}
+                <label> {{countfail}} mistakes</label>
+                {% endif %}
+                <div class="fields">
+                    <div class="field">
+                        <label for="a_key_encrypt">A key (relative prime of 26 between 1 and 25):</label>
+                        <label>[1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25]</label>
+                        <input type="text" id="a_key_encrypt" name="a_key_encrypt">
+                    </div>
+                    <div class="field">
+                        <label for="b_key_encrypt">B key (between 1 and 25):</label>
+                        <input type="text" id="b_key_encrypt" name="b_key_encrypt">
+                    </div>
+                    <div class="field" >
+                        <label for="cleartext">Text to encrypt:</label><br>
+                        <textarea name="cleartext"></textarea>
+                    </div>
+                    
+                </div>
+                <ul class="actions">
+                    <li><input type="submit" value="Encrypt" class="primary" /></li>
+                    <li><input type="reset" value="Clear" /></li>
+                </ul>
+
+                {% endif %}
+            </form>
+            <div>          
+                {% if encrypted %}
+                <div >
+                    {% if failed_encrypt %}
+                    <label>A key has been chosen for you</label>
+                    {% endif %}
+                    <label>Used key:  </label>
+                    <p>a: {{a_key_encrypt}}     b: {{b_key_encrypt}}</p>
+                </div>
+                <div >
+                    <label>Your text:</label>
+                    <p>{{cleartext}}</p>
+                </div>
+                <div >
+                    <label>Encoded text:</label>
+                    <p>{{encodedtext}}</p>
+                </div>
+                
+                <ul class="actions">
+                    <form action="." method="get">
+                        <button  type="submit" name="encrypt_again" value="encrypt">Encrypt again</button>
+                    </form>
+
+                </ul>
+
+                {% endif %}
+            </div>
+        </section>
+       
+        <section id="decrypt">
+            <form action="." method="post">
+                <h2>Decrypt</h2>
+                {% csrf_token %}
+                {% if not decrypted %}
+                {% if failed_decrypt %}
+                <label>Try scrolling down and use the cryptoanalisis!</label>
+                
+                {% elif mistake_decrypt%}
+                <label>{{countfail}} mistakes</label>
+                {% endif %}
+                
+                
+                <div class="fields">
+                    <div class="field">
+                        <label for="a_key_decrypt">A key (relative prime of 26 between 1 and 25):</label>
+                        <label>[1, 3, 5, 7, 9, 11, 15, 17, 19, 21, 23, 25]</label>
+                        <input type="text" id="a_key_decrypt" name="a_key_decrypt">
+                    </div>
+                    <div class="field">
+                        <label for="b_key_decrypt">B key (between 1 and 25):</label>
+                        <input type="text" id="b_key_decrypt" name="b_key_decrypt">
+                    </div>
+                    <div class="field" >
+                        <label for="codedtext">Text to decrypt:</label><br>
+                        <textarea name="codedtext"></textarea>
+                    </div>
+                </div>
+                
+                <ul class="actions">
+                    <li><input type="submit" value="Decrypt" class="primary" /></li>
+                    <li><input type="reset" value="Clear" /></li>
+                    <!-- <li><input type="submit" value="I don't know the key" class="primary" /></li> -->
+                </ul>
+
+                {% endif %}
+            </form>
+            <div>          
+                {% if decrypted %}
+                
+                <div >
+                    <label>Used key:  </label>
+                    <p>a: {{a_key_decrypt}}    b: {{b_key_decrypt}}</p>
+                </div>
+                <div >
+                    <label>Clear text:  </label>
+                    <p>{{cleartext}}</p>
+                </div>
+                <div >
+                    <label>Encoded text:</label>
+                    <p>{{encodedtext}}</p>
+                </div>
+                
+                <ul class="actions">
+                    <form action="." method="get">
+                        <button  type="submit" name="decrypt_again" value="decrypt">Decrypt again</button>
+                    </form>
+
+                </ul>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+</section>
+
+
+<section id="ende">
+    <div class="inner">
+        <section>
+        <form action="." method="post">
+            <h2>Cryptoanalisis</h2>
+            {% csrf_token %}
+            {% if not ca %}
+                
+            <div class="fields">
+                <div class="field" >
+                    <label for="codedtext_ca">Text to analize:</label><br>
+                    <textarea name="codedtext_ca"></textarea>
+                </div>
+            </div>
+            <ul class="actions">
+                <li><input type="submit" value="Cryptoanalisis" class="primary" /></li>
+                <li><input type="reset" value="Clear" /></li>
+            </ul>
+
+            {% endif %}
+        </form>
+        <div>          
+            {% if ca %}
+            <div >
+                <label> These are the frecuencies of each letter:  </label>
+                <p>{{frecuencies}}</p>
+            </div>
+            <div >
+                <label>After analizing we found that the most effective substitution is to change a and b for: </label>
+                <p>{{first_letter}}: {{first_frec}}   {{second_letter}}: {{second_frec}}  </p>
+            </div>
+            <div >
+                <label>Using this two letters to replace E and T respectively we obtain the following keys:</label>
+                <p>a: {{ares}}  b: {{bres}}</p>
+            </div>
+            <div >
+                <label>Decoded text using a and b:</label>
+                <p>{{cleartext_ca}}</p>
+            </div>
+            <div >
+                <label>Your text:</label>
+                <p>{{encodedtext_ca}}</p>
+            </div>
+            
+            <ul class="actions">
+                <form action="." method="get">
+                    <button  type="submit" name="decrypt_again" value="decrypt">Analize again</button>
+                </form>
+
+            </ul>
+            {% endif %}
+        </div>
+    </section>
+    </div>
+</section>
+
+
+{% endblock content %}
